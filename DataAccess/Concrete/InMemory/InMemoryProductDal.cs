@@ -3,6 +3,7 @@ using Entities.Concrete;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace DataAccess.Concrete.InMemory {
@@ -24,26 +25,16 @@ namespace DataAccess.Concrete.InMemory {
         }
 
         public void Delete(Product product) {
-            /*
-            Product productToDelete = null;
-            foreach (var p in _products) {
-                if (p.ProductId == product.ProductId) {
-                    productToDelete = p;
-                }
-            }
-            */
-
             Product productToDelete = _products.SingleOrDefault(p => p.ProductId == product.ProductId);
-
             _products.Remove(productToDelete);
         }
 
-        public List<Product> GetAll() {
-            return _products;
+        public Product Get(Expression<Func<Product, bool>> filter) {
+            throw new NotImplementedException();
         }
 
-        public List<Product> GetByCategoryId(int categoryId) {
-            return _products.Where(p => p.CategoryId == categoryId).ToList();
+        public List<Product> GetAll(Expression<Func<Product, bool>> filter = null) {
+            throw new NotImplementedException();
         }
 
         public void Update(Product product) {
