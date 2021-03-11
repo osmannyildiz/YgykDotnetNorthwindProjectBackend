@@ -6,9 +6,22 @@ using System;
 namespace ConsoleUi {
     class Program {
         static void Main(string[] args) {
+            ProductTest();
+            //CategoryTest();
+
+        }
+
+        private static void CategoryTest() {
+            CategoryManager categoryManager = new CategoryManager(new EfCategoryDal());
+            foreach (var category in categoryManager.GetAll()) {
+                Console.WriteLine(category.CategoryName);
+            }
+        }
+
+        private static void ProductTest() {
             ProductManager productManager = new ProductManager(new EfProductDal());
-            foreach (var product in productManager.GetAllByUnitPriceRange(10, 20)) {
-                Console.WriteLine("{0} - ${1:F2}", product.ProductName, product.UnitPrice);
+            foreach (var product in productManager.GetProductsDetails()) {
+                Console.WriteLine("{0} / {1} ({2})", product.CategoryName, product.ProductName, product.UnitsInStock);
             }
         }
     }
