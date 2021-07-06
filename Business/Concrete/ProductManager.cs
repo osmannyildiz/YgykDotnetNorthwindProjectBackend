@@ -26,11 +26,11 @@ namespace Business.Concrete {
         }
 
         public IDataResult<List<Product>> GetAll() {
-            if (DateTime.Now.Hour == 4) {
-                return new ErrorDataResult<List<Product>>(_productDal.GetAll(), Messages.MaintenanceHour);
-            } else {
+            //if (DateTime.Now.Hour == 23) {
+            //    return new ErrorDataResult<List<Product>>(_productDal.GetAll(), Messages.MaintenanceHour);
+            //} else {
                 return new SuccessDataResult<List<Product>>(_productDal.GetAll());
-            }
+            //}
         }
 
         public IDataResult<List<Product>> GetAllByCategoryId(int categoryId) {
