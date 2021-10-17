@@ -35,9 +35,10 @@ namespace Core.DataAccess.EntityFramework {
 
         public List<TEntity> GetAll(Expression<Func<TEntity, bool>> filter = null) {
             using (TContext context = new TContext()) {
-                return filter == null
-                    ? context.Set<TEntity>().ToList()
-                    : context.Set<TEntity>().Where(filter).ToList();
+                if (filter == null)
+                    return context.Set<TEntity>().ToList();
+                else
+                    return context.Set<TEntity>().Where(filter).ToList();
             }
         }
 

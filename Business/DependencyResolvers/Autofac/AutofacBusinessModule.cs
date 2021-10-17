@@ -16,6 +16,9 @@ namespace Business.DependencyResolvers.Autofac {
             builder.RegisterType<EfProductDal>().As<IProductDal>().SingleInstance();
             builder.RegisterType<ProductManager>().As<IProductService>().SingleInstance();
 
+            builder.RegisterType<EfCategoryDal>().As<ICategoryDal>().SingleInstance();
+            builder.RegisterType<CategoryManager>().As<ICategoryService>().SingleInstance();
+
             // Taken from https://github.com/engindemirog/NetCoreBackend/blob/master/Business/DependencyResolvers/Autofac/AutofacBusinessModule.cs
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
             builder.RegisterAssemblyTypes(assembly).AsImplementedInterfaces()
