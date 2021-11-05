@@ -1,4 +1,5 @@
 ﻿using Business.Abstract;
+using Business.Aspects.Autofac.Auth;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
 using Core.Aspects.Autofac.Validation;
@@ -7,7 +8,7 @@ using Core.Utilities.Business;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entities.Concrete;
-using Entities.Dto;
+using Entities.Dtos;
 using FluentValidation;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,7 @@ namespace Business.Concrete {
             _categoryManager = categoryManager;
         }
 
+        [SecuredOperation("product.add,admin")]
         [ValidationAspect(typeof(ProductValidator))]
         public IResult Add(Product product) {
             var errorResult = BusinessEngine.Run(
