@@ -1,4 +1,5 @@
 ﻿using Castle.DynamicProxy;
+using Core.Aspects.Autofac.Performance;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,12 +10,15 @@ namespace Core.Utilities.Interceptors {
     // Taken from https://github.com/engindemirog/NetCoreBackend/blob/master/Core/Utilities/Interceptors/AspectInterceptorSelector.cs
     public class AspectInterceptorSelector : IInterceptorSelector {
         public IInterceptor[] SelectInterceptors(Type type, MethodInfo method, IInterceptor[] interceptors) {
+            var attributes = new List<MethodInterceptionBaseAttribute>();
             var classAttributes = type.GetCustomAttributes<MethodInterceptionBaseAttribute>(true).ToList();
+            attributes.AddRange(classAttributes);
             var methodAttributes = type.GetMethod(method.Name).GetCustomAttributes<MethodInterceptionBaseAttribute>(true);
-            classAttributes.AddRange(methodAttributes);
-            //classAttributes.Add(new ExceptionLogAspect(typeof(FileLogger)));
+            attributes.AddRange(methodAttributes);
+            //attributes.Add(new ExceptionLogAspect(typeof(FileLogger)));
+            attributes.Add(new PerformanceAspect(2));
 
-            return classAttributes.OrderBy(x => x.Priority).ToArray();
+            return attributes.OrderBy(x => x.Priority).ToArray();
         }
     }
 }

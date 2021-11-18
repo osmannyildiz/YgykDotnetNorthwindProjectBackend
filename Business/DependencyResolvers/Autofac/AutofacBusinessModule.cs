@@ -28,8 +28,6 @@ namespace Business.DependencyResolvers.Autofac {
 
             builder.RegisterType<JwtTokenHelper>().As<ITokenHelper>();
 
-            //builder.RegisterType<HttpContextAccessor>().As<IHttpContextAccessor>();
-
             // Taken from https://github.com/engindemirog/NetCoreBackend/blob/master/Business/DependencyResolvers/Autofac/AutofacBusinessModule.cs
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
             builder.RegisterAssemblyTypes(assembly).AsImplementedInterfaces()

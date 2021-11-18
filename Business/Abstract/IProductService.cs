@@ -14,5 +14,7 @@ namespace Business.Abstract {
         IDataResult<List<ProductDetailDto>> GetProductsDetails();
         IResult Add(Product product);
         IResult Update(Product product);
+        // For testing the transaction aspect
+        IResult AddTwice(Product product, string nameSuffix1, string nameSuffix2);
     }
 }

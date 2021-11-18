@@ -46,5 +46,16 @@ namespace WebApi.Controllers {
                 return BadRequest(result);
             }
         }
+
+        // For testing the transaction aspect
+        [HttpPost("addTwice")]
+        public IActionResult AddTwice(Product product, string nameSuffix1, string nameSuffix2) {
+            var result = _productService.AddTwice(product, nameSuffix1, nameSuffix2);
+            if (result.Success) {
+                return Ok(result);
+            } else {
+                return BadRequest(result);
+            }
+        }
     }
 }

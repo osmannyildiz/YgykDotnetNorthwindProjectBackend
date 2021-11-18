@@ -2,6 +2,8 @@
 using Business.Aspects.Autofac.Auth;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Caching;
+using Core.Aspects.Autofac.Transaction;
 using Core.Aspects.Autofac.Validation;
 using Core.CrossCuttingConcerns.Validation;
 using Core.Utilities.Business;
@@ -14,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace Business.Concrete {
     public class ProductManager : IProductService {
@@ -25,11 +28,12 @@ namespace Business.Concrete {
             _categoryManager = categoryManager;
         }
 
-        [SecuredOperation("product.add,admin")]
+        [SecuredOperation("products.add,admin")]
         [ValidationAspect(typeof(ProductValidator))]
+        [CacheRemoveAspect("IProductService.Get")]
         public IResult Add(Product product) {
             var errorResult = BusinessEngine.Run(
-                CheckIfProductCountOfCategoryExceeded(product.CategoryId),
+                //CheckIfProductCountOfCategoryExceeded(product.CategoryId),
                 CheckIfProductWithSameNameExists(product.ProductName),
                 CheckIfThereAreTooManyCategories()
             );
@@ -41,14 +45,13 @@ namespace Business.Concrete {
             return new SuccessResult(Messages.ProductAdded);
         }
 
+        [CacheAspect]
         public IDataResult<List<Product>> GetAll() {
-            //if (DateTime.Now.Hour == 23) {
-            //    return new ErrorDataResult<List<Product>>(_productDal.GetAll(), Messages.MaintenanceHour);
-            //} else {
-                return new SuccessDataResult<List<Product>>(_productDal.GetAll());
-            //}
+            //Thread.Sleep(2000);
+            return new SuccessDataResult<List<Product>>(_productDal.GetAll());
         }
 
+        [CacheAspect]
         public IDataResult<List<Product>> GetAllByCategoryId(int categoryId) {
             return new SuccessDataResult<List<Product>>(_productDal.GetAll(p => p.CategoryId == categoryId));
         }
@@ -57,18 +60,47 @@ namespace Business.Concrete {
             return new SuccessDataResult<List<Product>>(_productDal.GetAll(p => p.UnitPrice >= min && p.UnitPrice <= max));
         }
 
+        [CacheAspect]
         public IDataResult<Product> GetById(int id) {
             return new SuccessDataResult<Product>(_productDal.Get(p => p.ProductId == id));
         }
 
+        [CacheAspect]
         public IDataResult<List<ProductDetailDto>> GetProductsDetails() {
             return new SuccessDataResult<List<ProductDetailDto>>(_productDal.GetProductsDetails());
         }
 
         [ValidationAspect(typeof(ProductValidator))]
+        [CacheRemoveAspect("IProductService.Get")]
         public IResult Update(Product product) {
             _productDal.Update(product);
             return new SuccessResult(Messages.ProductUpdated);
+        }
+
+        // For testing the transaction aspect
+        [SecuredOperation("products.add,admin")]
+        [ValidationAspect(typeof(ProductValidator))]
+        [TransactionScopeAspect]
+        [CacheRemoveAspect("IProductService.Get")]
+        public IResult AddTwice(Product product, string nameSuffix1, string nameSuffix2) {
+            var result1 = Add(new Product {
+                CategoryId = product.CategoryId,
+                ProductName = product.ProductName + " " + nameSuffix1,
+                UnitsInStock = product.UnitsInStock,
+                UnitPrice = product.UnitPrice
+            });
+            var result2 = Add(new Product {
+                CategoryId = product.CategoryId,
+                ProductName = product.ProductName + " " + nameSuffix2,
+                UnitsInStock = product.UnitsInStock,
+                UnitPrice = product.UnitPrice
+            });
+            
+            if (!result1.Success || !result2.Success) {
+                throw new Exception("Transaction failed.");
+            }
+
+            return new SuccessResult("Transaction was successful.");
         }
 
         private IResult CheckIfProductCountOfCategoryExceeded(int categoryId) {
