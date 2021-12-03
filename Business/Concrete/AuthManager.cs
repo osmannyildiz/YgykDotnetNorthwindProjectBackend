@@ -44,7 +44,7 @@ namespace Business.Concrete {
             }
 
             if (!HashingTool.VerifyPasswordHash(userLoginDto.Password, userToCheck.PasswordHash, userToCheck.PasswordSalt)) {
-                return new ErrorDataResult<User>(Messages.WrongPassword);
+                return new ErrorDataResult<User>(Messages.IncorrectPassword);
             }
 
             return new SuccessDataResult<User>(userToCheck, Messages.LoginSuccessful);
