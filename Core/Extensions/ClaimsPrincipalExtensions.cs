@@ -7,13 +7,13 @@ using System.Text;
 namespace Core.Extensions {
     // Taken from https://github.com/engindemirog/NetCoreBackend/blob/master/Core/Extensions/ClaimsPrincipalExtensions.cs
     public static class ClaimsPrincipalExtensions {
-        public static List<string> Claims(this ClaimsPrincipal claimsPrincipal, string claimType) {
+        public static List<string> GetClaims(this ClaimsPrincipal claimsPrincipal, string claimType) {
             var result = claimsPrincipal?.FindAll(claimType)?.Select(x => x.Value).ToList();
             return result;
         }
 
-        public static List<string> ClaimRoles(this ClaimsPrincipal claimsPrincipal) {
-            return claimsPrincipal?.Claims(ClaimTypes.Role);
+        public static List<string> GetRoleClaims(this ClaimsPrincipal claimsPrincipal) {
+            return claimsPrincipal?.GetClaims(ClaimTypes.Role);
         }
     }
 }

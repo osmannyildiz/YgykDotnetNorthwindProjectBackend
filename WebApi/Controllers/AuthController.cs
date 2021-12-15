@@ -1,5 +1,7 @@
 ﻿using Business.Abstract;
 using Core.Entities.Dtos;
+using Core.Utilities.Results;
+using Core.Utilities.Security.Jwt;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -19,33 +21,37 @@ namespace WebApi.Controllers {
 
         [HttpPost("login")]
         public IActionResult Login(UserLoginDto userLoginDto) {
-            var userToLogin = _authService.Login(userLoginDto);
-            if (!userToLogin.Success) {
-                return BadRequest(userToLogin.Message);
+            var loginResult = _authService.Login(userLoginDto);
+            if (!loginResult.Success) {
+                return BadRequest(new ErrorResult(loginResult.Message));
             }
 
-            var result = _authService.CreateAccessToken(userToLogin.Data);
-            if (!result.Success) {
-                return BadRequest(result.Message);
+            var tokenResult = _authService.CreateAccessToken(loginResult.Data);
+            if (!tokenResult.Success) {
+                return BadRequest(new ErrorResult(tokenResult.Message));
             }
 
-            return Ok(result.Data);
+            return Ok(new SuccessDataResult<AccessToken>(tokenResult.Data, loginResult.Message));
         }
 
         [HttpPost("register")]
         public IActionResult Register(UserRegisterDto userRegisterDto) {
-            var userExists = _authService.UserWithEmailAlreadyExists(userRegisterDto.Email);
-            if (!userExists.Success) {
-                return BadRequest(userExists.Message);
+            var userExistsResult = _authService.UserWithEmailAlreadyExists(userRegisterDto.Email);
+            if (!userExistsResult.Success) {
+                return BadRequest(new ErrorResult(userExistsResult.Message));
             }
 
             var registerResult = _authService.Register(userRegisterDto);
-            var result = _authService.CreateAccessToken(registerResult.Data);
-            if (!result.Success) {
-                return BadRequest(result.Message);
+            if (!registerResult.Success) {
+                return BadRequest(new ErrorResult(registerResult.Message));
             }
 
-            return Ok(result.Data);
+            var tokenResult = _authService.CreateAccessToken(registerResult.Data);
+            if (!tokenResult.Success) {
+                return BadRequest(new ErrorResult(tokenResult.Message));
+            }
+
+            return Ok(new SuccessDataResult<AccessToken>(tokenResult.Data, registerResult.Message));
         }
     }
 }
